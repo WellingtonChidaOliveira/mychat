@@ -11,9 +11,9 @@ if not api_key:
     logging.error("OPENAI_API_KEY environment variable not set.")
     sys.exit(1)
 
-class RAGModel:
+class ChatService:
     def __init__(self):
-        openai.api_key = api_key
+            openai.api_key = api_key
 
     async def generate_response_stream(self, query):
         try:
