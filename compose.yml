@@ -1,8 +1,7 @@
+
 services:
   db:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: postgres
     restart: always
     environment:
       POSTGRES_DB: chatbot_db
