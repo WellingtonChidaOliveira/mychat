@@ -24,3 +24,8 @@ class UserService:
         hashed_password = bcrypt.hashpw(user.password.encode('utf-8'), salt.encode('utf-8')).decode('utf-8')
         new_user = User(username=user.username, email=user.email, hashed_password=hashed_password, salt=salt)
         self.user_repository.add(new_user)
+        
+    def delete(self, email: str):
+        existing_user = self.user_repository.get_by_email(email)
+        self.user_repository.delete(existing_user.id)
+        

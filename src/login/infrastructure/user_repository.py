@@ -11,3 +11,8 @@ class UserRepository:
     def add(self, user: User):
         self.session.add(user)
         self.session.commit()
+        
+    def delete(self, user_id: int):
+        user = self.session.query(User).filter(User.id == user_id).first()
+        self.session.delete(user)
+        self.session.commit()
