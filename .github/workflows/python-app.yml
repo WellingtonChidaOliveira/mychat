@@ -30,6 +30,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
         PYTHONPATH: ${{ github.workspace }}
       run: |
         pytest -v
