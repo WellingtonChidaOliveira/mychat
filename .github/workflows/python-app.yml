@@ -43,13 +43,15 @@ jobs:
       run: |
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Initialize Database
+    - name: Check database tables
       env:
         DATABASE_URL: postgresql://myuser:mypassword@localhost:5432/chatbot_db
+        PYTHONPATH: ${{ github.workspace }}
       run: |
         python -c "from src.login.infrastructure.database import init_db; init_db()"
     - name: Test with pytest
       env:
         DATABASE_URL: postgresql://myuser:mypassword@localhost:5432/chatbot_db
+        PYTHONPATH: ${{ github.workspace }}
       run: |
-        PYTHONPATH=$(pwd) pytest
+        pytest -v
