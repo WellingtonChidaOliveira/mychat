@@ -1,28 +1,34 @@
-import os
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
-DATABASE_URL = os.getenv('DATABASE_URL')
-if not DATABASE_URL:
-    raise ValueError("DATABASE_URL is not set")
-
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+DATABASE_URL = os.getenv("DATABASE_URL")
+engine = create_engine("postgresql://myuser:mypassword@localhost:5432/chatbot_db")
+Session_db = sessionmaker(bind=engine, expire_on_commit=False)
 
 Base = declarative_base()
 
+def get_session():
+    session = Session_db()
+    try:
+        yield session
+    finally:
+        session.close()
+    
 def init_db():
     from src.login.domain.user import User  
     
     inspector = inspect(engine)
-    if not inspector.has_table("users"):
-        Base.metadata.create_all(bind=engine)
-        print("Table 'users' created successfully.")
+    if inspector.has_table("users"):
+        print("Table 'users' exists.")
     else:
-        print("Table 'users' already exists.")
-
+        print("Warning: Table 'users' does not exist. Please ensure it's created manually.")
+    
+    print("Tables in the database:", inspector.get_table_names())
 
 if __name__ == "__main__":
     init_db()
