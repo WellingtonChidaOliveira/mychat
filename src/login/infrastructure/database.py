@@ -7,7 +7,10 @@ import os
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-engine = create_engine("postgresql://myuser:mypassword@localhost:5432/chatbot_db")
+if not DATABASE_URL:
+    DATABASE_URL = "postgresql://myuser:mypassword@localhost:5432/chatbot_db"
+
+engine = create_engine(DATABASE_URL)
 Session_db = sessionmaker(bind=engine, expire_on_commit=False)
 
 Base = declarative_base()
@@ -18,15 +21,16 @@ def get_session():
         yield session
     finally:
         session.close()
-    
+
 def init_db():
     from src.login.domain.user import User  
     
     inspector = inspect(engine)
-    if inspector.has_table("users"):
-        print("Table 'users' exists.")
+    if not inspector.has_table("users"):
+        print("Table 'users' does not exist. Creating it now.")
+        Base.metadata.create_all(bind=engine)
     else:
-        print("Warning: Table 'users' does not exist. Please ensure it's created manually.")
+        print("Table 'users' already exists.")
     
     print("Tables in the database:", inspector.get_table_names())
 

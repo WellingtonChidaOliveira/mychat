@@ -4,6 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 from src.login.infrastructure.database import init_db
 from src.login.api.authentication import router
+from sqlalchemy.exc import OperationalError
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -24,8 +25,12 @@ def generate_random_user():
     }
     
 @pytest.fixture(scope="session", autouse=True)
-def initialize_database():
-    init_db()
+def setup_database():
+    try:
+        init_db()
+    except OperationalError as e:
+        pytest.fail(f"Failed to connect to the database: {str(e)}")
+
 
 
 def test_register_user(generate_random_user):
