@@ -1,11 +1,15 @@
 import asyncio
 import uvicorn
 from fastapi import FastAPI
+from src.login.infrastructure.init_db import init_db
 from src.login.api import authentication as login_auth
 from src.chatbot.api import chat as websocket_chat
 from dotenv import load_dotenv
 
+
 load_dotenv()  # Load environment variables from .env file
+
+init_db()
 
 app = FastAPI()
 
