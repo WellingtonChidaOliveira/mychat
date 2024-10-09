@@ -31,7 +31,7 @@ jobs:
     - name: Test with pytest
       env:
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        OPENAI_API_KEY: ${{secrests.OPENAI_API_KEY}}
+        OPENAI_API_KEY: ${{secrets.OPENAI_API_KEY}}
         PYTHONPATH: ${{ github.workspace }}
       run: |
         pytest -v -s
