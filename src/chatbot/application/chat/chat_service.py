@@ -3,6 +3,11 @@ from dotenv import load_dotenv
 import os
 import sys
 import logging
+from sqlalchemy.orm import Session
+
+from ...domain.chat import Chat
+
+from ...infrastructure.chat_repository import ChatRepository
 
 load_dotenv()
 
@@ -12,16 +17,17 @@ if not api_key:
     sys.exit(1)
 
 class ChatService:
-    def __init__(self):
+    def __init__(self, session:Session):
             openai.api_key = api_key
+            self.chat_repository = ChatRepository(session)
 
-    async def generate_response_stream(self, query):
+    async def generate_response_stream(self, query, old_messages):
         try:
+            messages = old_messages if old_messages else []
+            messages.append({"role": "system", "content": "You are a helpful assistant for municipal managers developing climate adaptation plans."})
+            messages.append({"role": "user", "content": query})
             response = openai.chat.completions.create(
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant for municipal managers developing climate adaptation plans."},
-                    {"role": "user", "content": query}
-                ],
+                messages= messages,
                 model="gpt-4",
                 stream=True,
             )
@@ -32,3 +38,4 @@ class ChatService:
         except Exception as e:
             logging.error(f"Error in generate_response_stream: {e}")
             raise
+        
