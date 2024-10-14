@@ -11,8 +11,8 @@ router = APIRouter()
 def login_user(user: UserLogin, session: Session = Depends(get_session)):
     user_service = UserService(session)
     try:
-        user_service.login(user)
-        return JSONResponse(status_code=200, content={"message": "User logged in successfully."})
+        token = user_service.login(user)
+        return JSONResponse(status_code=200, content={"access_token": token, "token_type": "bearer"})
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -20,8 +20,8 @@ def login_user(user: UserLogin, session: Session = Depends(get_session)):
 def register_user(user: UserCreate, session: Session = Depends(get_session)):
     user_service = UserService(session)
     try:
-        user_service.register(user)
-        return JSONResponse(status_code=201, content={"message": "User created successfully."})
+        token = user_service.register(user)
+        return JSONResponse(status_code=201, content={"message": "User created successfully.", "access_token": token, "token_type": "bearer"})
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     
