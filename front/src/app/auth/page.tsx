@@ -27,8 +27,7 @@ export default function auth() {
       <Formik
         initialValues={{ email: '', password: '' }}
         validationSchema={validationSchema}
-        onSubmit={(values) => sendForm(values)}
-      >
+        onSubmit={(values) => sendForm(values)}>
         {({ handleSubmit }) => (
           <Form className="w-full flex flex-col items-center gap-[40px]" onSubmit={handleSubmit}>
             <div className="w-full flex flex-col gap-[12px]">
@@ -46,8 +45,8 @@ export default function auth() {
                   <input type="checkbox" className="accent-[#589b97a1]" />
                   <p className="text-[#372F30]">Lembrar-me</p>
                 </div>
-                <Link href='/auth/password' passHref>
-                  <button className="text-[#372F30] underline">Esqueceu sua senha?</button>
+                <Link href='/auth/password' passHref className='text-[#372F30] underline'>
+                    Esqueceu sua senha?
                 </Link>
               </div>
             </div>
