@@ -30,14 +30,17 @@ export default function auth() {
         onSubmit={(values) => sendForm(values)}
       >
         {({ handleSubmit }) => (
-          <Form className="w-full flex flex-col gap-[12px]" onSubmit={handleSubmit}>
+          <Form className="w-full flex flex-col items-center gap-[40px]" onSubmit={handleSubmit}>
             <div className="w-full flex flex-col gap-[12px]">
-              <Field name="email" placeholder="E-mail" component={InputField} />
-              <ErrorMessage name="email" component="div" className="text-red-500" />
+                <div>
+                    <Field name="email" placeholder="E-mail" component={InputField} />
+                    <ErrorMessage name="email" component="div" className="text-red-500" />
+                </div>
 
-              <Field name="password" type="password" placeholder="Senha" component={InputField} />
-              <ErrorMessage name="password" component="div" className="text-red-500" />
-
+                <div>
+                    <Field name="password" type="password" placeholder="Senha" component={InputField} />
+                    <ErrorMessage name="password" component="div" className="text-red-500" />
+                </div>
               <div className="flex justify-between w-full">
                 <div className="flex gap-2">
                   <input type="checkbox" className="accent-[#589b97a1]" />
@@ -49,7 +52,7 @@ export default function auth() {
               </div>
             </div>
 
-            <div className="w-[80%] flex flex-col gap-[16px]">
+            <div className="w-[80%] flex flex-col  gap-[16px]">
               <Button text="Entrar" variant="primary" type="submit" />
               <Button href="/auth/sign-in" text="Cadastre-se" variant="secundary" />
             </div>
