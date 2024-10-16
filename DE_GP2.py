@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import os
 import fitz  # PyMuPDF
 import re
 import nltk
+import os
+from dotenv import load_dotenv
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import psycopg2  # For PostgreSQL interaction
@@ -17,8 +18,10 @@ nltk.download('stopwords')
 # Set stopwords language to Portuguese
 stop_words = set(stopwords.words('portuguese'))
 
+load_dotenv()
+openai_api_key = os.getenv('OPENAI_API_KEY')
 # Initialize OpenAI client (add your API key)
-client = OpenAI(api_key='your_api_key')  # Replace with your actual API key
+client = OpenAI(api_key= openai_api_key)  # Replace with your actual API key
 
 # Function to clean text data
 def clean_text(text):
@@ -96,10 +99,10 @@ def insert_data_to_postgresql(pdf_name, cleaned_text, embeddings, metadata, conn
 # PostgreSQL connection setup
 def create_postgresql_connection():
     conn = psycopg2.connect(
-        host="localhost",  # Replace with your host
-        database="your_database",
-        user="your_user",
-        password="your_password"
+        host="localhost:5432",  
+        database="chatbot_db",
+        user="myuser",
+        password="mypassword"
     )
     return conn
 
