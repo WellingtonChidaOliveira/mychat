@@ -16,7 +16,7 @@ export default function SignIn(){
 
     const sendForm = (values: { password: string; confirmPassword: string }) => {
         console.log('Dados enviados:', values);
-        router.push('./');
+        router.push('/auth');
     };
     return(
         <div className="flex flex-col items-center gap-[42px]">
@@ -26,7 +26,7 @@ export default function SignIn(){
                 validationSchema={validationSchema}
                 onSubmit={(values) => sendForm(values)}>
                 {({ handleSubmit }) => (
-                    <Form className=" w-full flex flex-col items-center gap-[42px]">
+                    <Form className=" w-full flex flex-col items-center gap-[42px]" onSubmit={handleSubmit}>
                         <div className=" w-full flex flex-col gap-[16px]">
                             <p className="text-[18px] font-normal leading-[27px] font-poppins text-[#333333]">
                                 Insira uma nova senha para a sua conta.
