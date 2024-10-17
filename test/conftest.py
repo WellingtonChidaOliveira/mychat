@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from main import app
 from database import Base, get_session
-from src.login.domain.user import User
+from src.login.domain.entities.user import User
 
 # Use SQLite in-memory database for testing
 TEST_DATABASE_URL = "sqlite:///:memory:"

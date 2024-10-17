@@ -1,9 +1,9 @@
 import bcrypt
 import pytest
 from unittest.mock import MagicMock
-from src.login.application.user_service import UserService
+from src.login.application.interfaces.user_service import UserService
 from src.login.schemas.user_schemas import UserLogin, UserCreate
-from src.login.domain.user import User
+from src.login.domain.entities.user import User
 
 @pytest.fixture
 def mock_session():

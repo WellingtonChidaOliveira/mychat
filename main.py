@@ -1,21 +1,21 @@
 import asyncio
 import uvicorn
 from fastapi import FastAPI
-from src.login.infrastructure.init_db import init_db
-from src.chatbot.infrastructure.init_db_chat import init_db_chat
-from src.login.api import authentication as login_auth
-from src.chatbot.api import chat as websocket_chat
+from src.shared.infrastructure.database import init_db
+from src.auth.api.routes.login import login_router as login_router
+from src.auth.api.routes.register import register_route as register_router
+from src.chatbot.api.routes import chat_routes as websocket_chat
 from dotenv import load_dotenv
 
 
 load_dotenv()  # Load environment variables from .env file
 
 init_db()
-init_db_chat()
 
 app = FastAPI()
 
-app.include_router(login_auth.router, prefix="/auth")
+app.include_router(login_router.router, prefix="/auth")
+app.include_router(register_router.router, prefix="/auth")
 app.include_router(websocket_chat.router, prefix="/chat")
 
 async def main():
