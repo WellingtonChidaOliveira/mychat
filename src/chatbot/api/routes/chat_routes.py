@@ -2,6 +2,9 @@ import json
 import logging
 from fastapi import APIRouter, Depends,HTTPException, WebSocket, WebSocketDisconnect, status
 
+from ....shared.utils.get_services import Utils
+
+from ...application.use_cases.get_chat_by_id import GetChatByIdUseCase
 from ...application.use_cases.create_chat import CreateChatUseCase
 from ...application.use_cases.process_message import ProcessMessageUseCase
 from ...infrastructure.database.repositories.chat_repository import SQLAlchemyChatRepository
@@ -23,9 +26,8 @@ async def chat(
 ):
     await websocket.accept()
     try:
-        token = next((v for k, v in websocket.headers.items() if k.lower() == "authorization"), None)
-        chat_id = next((v for k, v in websocket.headers.items() if k.lower() == "chatid"), None)
-       
+        token = Utils.get_header(websocket=websocket, header_name="authorization")
+        chat_id = Utils.get_header(websocket=websocket, header_name="chatid")
         user_email = await get_current_user(token) if validate_token(token) else None
         logging.info(f"Token: {user_email}")
         
@@ -34,19 +36,24 @@ async def chat(
         rag_model = RAGModel()
         process_message_use_case = ProcessMessageUseCase(chat_repository, rag_model)
         create_chat_use_case = CreateChatUseCase(chat_repository)
+        get_chat_by_id_use_case = GetChatByIdUseCase(chat_repository)
+        chat_context = []
 
         if user_email and not chat_id:
             logging.info("Creating chat")
             chat = await create_chat_use_case.execute(user_email)
-            logging.info(f"Chat created: {chat}")
             chat_id = chat
         elif user_email and chat_id:
-            chat = await chat_repository.get_chat_by_id(chat_id)
-            old_messages = chat.messages
-
+            logging.info("Getting chat")
+            chat = await get_chat_by_id_use_case.execute(chat_id)
+            logging.info(f"Can get chat: {chat.user_id}")
+            chat_context = chat.message
+            
         while True:
-            data = await websocket.receive_text()
-            async for response in process_message_use_case.execute(chat_id, data):
+            new_message = await websocket.receive_text()
+            chat_context.append({"role": "user", "content": new_message})
+                
+            async for response in process_message_use_case.execute(chat_id, json.dumps(chat_context)):
                 await websocket.send_text(json.dumps({"response": response}))
             await websocket.send_text(json.dumps({"end": True}))
 

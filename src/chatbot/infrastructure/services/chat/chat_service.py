@@ -21,13 +21,10 @@ class ChatService:
             openai.api_key = api_key
             
 
-    async def generate_response_stream(self, query,):
+    async def generate_response_stream(self, query):
         try:
-            # messages.append({"role": "system", "content": "You are a helpful assistant for municipal managers developing climate adaptation plans."})
-            # messages.append({"role": "user", "content": query})
             response = openai.chat.completions.create(
                 messages= [
-                    {"role": "system", "content": "You are a helpful assistant for municipal managers developing climate adaptation plans."},
                     {"role": "user", "content": query}
                 ],
                 model="gpt-4",
