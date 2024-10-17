@@ -2,15 +2,15 @@ import json
 import logging
 from fastapi import APIRouter, Depends,HTTPException, WebSocket, WebSocketDisconnect, status
 
-from ....shared.utils.get_services import Utils
+from .....shared.utils.get_services import Utils
 
-from ...application.use_cases.get_chat_by_id import GetChatByIdUseCase
-from ...application.use_cases.create_chat import CreateChatUseCase
-from ...application.use_cases.process_message import ProcessMessageUseCase
-from ...infrastructure.database.repositories.chat_repository import SQLAlchemyChatRepository
-from ...application.use_cases.rag_model import RAGModel
-from ....shared.middleware.token_middleware import get_current_user, validate_token
-from ....shared.infrastructure.database import get_session
+from ....application.use_cases.get_chat_by_id import GetChatByIdUseCase
+from ....application.use_cases.create_chat import CreateChatUseCase
+from ....application.use_cases.process_message import ProcessMessageUseCase
+from ....infrastructure.database.repositories.chat_repository import SQLAlchemyChatRepository
+from ....application.use_cases.rag_model import RAGModel
+from .....shared.middleware.token_middleware import get_current_user, validate_token
+from .....shared.infrastructure.database import get_session
 from sqlalchemy.orm import Session
 
 
