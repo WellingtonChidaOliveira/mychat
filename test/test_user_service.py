@@ -1,35 +1,65 @@
-import bcrypt
 import pytest
-from unittest.mock import MagicMock
-from src.login.application.interfaces.user_service import UserService
-from src.login.schemas.user_schemas import UserLogin, UserCreate
-from src.login.domain.entities.user import User
+import bcrypt
+from src.auth.application.use_cases.register import RegisterUseCase
+from src.auth.application.use_cases.login import LoginUseCase
+from src.auth.infrastructure.database.repositories.user_repository import SQLAlchemyUserRepository
+from src.auth.schemas.user_schemas import UserCreate, UserLogin
+from src.auth.domain.entities.user import User, Base
+
+@pytest.fixture(autouse=True)
+def clean_database(db_session):
+    yield
+    for table in reversed(Base.metadata.sorted_tables):
+        db_session.execute(table.delete())
+    db_session.commit()
 
 @pytest.fixture
-def mock_session():
-    return MagicMock()
+def user_repository(db_session):
+    return SQLAlchemyUserRepository(db_session)
 
 @pytest.fixture
-def user_service(mock_session):
-    return UserService(mock_session)
+def register_use_case(user_repository):
+    return RegisterUseCase(user_repository)
 
-def test_register_user(user_service):
+@pytest.fixture
+def login_use_case(user_repository):
+    return LoginUseCase(user_repository)
+
+def test_register_user_success(register_use_case, db_session):
     user_create = UserCreate(username="testuser", email="test@example.com", password="password123")
-    user_service.user_repository.get_by_email = MagicMock(return_value=None)
-    user_service.user_repository.add = MagicMock()
+    
+    result = register_use_case.execute(user_create.username, user_create.email, user_create.password)
+    
+    assert result.username == "testuser"
+    assert result.email == "test@example.com"
+    
+    saved_user = db_session.query(User).filter_by(email="test@example.com").first()
+    assert saved_user is not None
+    assert saved_user.username == "testuser"
 
-    user_service.register(user_create)
+def test_register_user_duplicate_email(register_use_case, db_session):
+    user_create = UserCreate(username="testuser", email="test@example.com", password="password123")
+    register_use_case.execute(user_create.username, user_create.email, user_create.password)
+    
+    with pytest.raises(ValueError, match="User already exists"):
+        register_use_case.execute("anotheruser", "test@example.com", "anotherpassword")
 
-    user_service.user_repository.get_by_email.assert_called_once_with("test@example.com")
-    user_service.user_repository.add.assert_called_once()
+def test_login_user_success(register_use_case, login_use_case):
+    user_create = UserCreate(username="testuser", email="test@example.com", password="password123")
+    register_use_case.execute(user_create.username, user_create.email, user_create.password)
+    
+    result = login_use_case.execute("test@example.com", "password123")
+    
+    assert result.email == "test@example.com"
+    assert result.username == "testuser"
 
-def test_login_user(user_service):
-    user_login = UserLogin(email="test@example.com", password="password123")
-    salt = bcrypt.gensalt().decode('utf-8')  # Gerar um salt válido
-    password = bcrypt.hashpw(user_login.password.encode('utf-8'), salt.encode('utf-8')).decode('utf-8')
-    mock_user = User(username="user", email="test@example.com",hashed_password=password, salt=salt)
-    user_service.user_repository.get_by_email = MagicMock(return_value=mock_user)
+def test_login_user_wrong_password(register_use_case, login_use_case):
+    user_create = UserCreate(username="testuser", email="testdsad@example.com", password="dasdskajdhsak")
+    register_use_case.execute(user_create.username, user_create.email, user_create.password)
+    
+    with pytest.raises(ValueError, match="Invalid email or password"):
+        login_use_case.execute("testdsad@example.com", "wrongpassword")
 
-    user_service.login(user_login)
-
-    user_service.user_repository.get_by_email.assert_called_once_with("test@example.com")
+def test_login_user_nonexistent(login_use_case):
+    with pytest.raises(ValueError, match="User does not exist."):
+        login_use_case.execute("nonexistent@example.com", "password123")
