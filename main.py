@@ -4,9 +4,9 @@ from fastapi import FastAPI
 from src.shared.infrastructure.database import init_db
 from src.auth.api.routes.login import login_router as login_router
 from src.auth.api.routes.register import register_route as register_router
-from chatbot.api.routes.chat import chat_routes as websocket_chat_router
-from chatbot.api.routes.delete_chat import delete_chat_route as delete_chat_router
-from chatbot.api.routes.get_chats import get_chats_route as get_chats_router
+from src.chatbot.api.routes.chat import chat_routes as websocket_chat_router
+from src.chatbot.api.routes.delete_chat import delete_chat_route as delete_chat_router
+from src.chatbot.api.routes.get_chats import get_chats_route as get_chats_router
 from dotenv import load_dotenv
 
 
