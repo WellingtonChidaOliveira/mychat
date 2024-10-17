@@ -1,12 +1,11 @@
-from dataclasses import dataclass
 from sqlalchemy import Column, String
-from ....shared.infrastructure.database import Base
+from sqlalchemy.ext.declarative import declarative_base
 
-@dataclass
+Base = declarative_base()
+
 class User(Base):
     __tablename__ = "users"
-    username = Column(String, unique=True, index=True)
-    email = Column(String, unique=True,primary_key=True ,index=True)
-    hashed_password = Column(String)
+    username = Column(String(255), unique=True, index=True, nullable=False)
+    email = Column(String(255), unique=True, primary_key=True, index=True, nullable=False)
+    hashed_password = Column(String(255), nullable=False)
     salt = Column(String)
-    

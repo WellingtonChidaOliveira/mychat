@@ -11,7 +11,7 @@ class LoginUseCase:
     def execute(self, user_email: str, user_password: str) -> User:
         existing_user = self.user_repository.get_by_email(user_email)
         if not existing_user:
-            raise ValueError("User does not exist.")
+            raise ValueError("Invalid email or password")
         
         if not bcrypt.checkpw(user_password.encode('utf-8'), existing_user.hashed_password.encode('utf-8')):
             raise ValueError("Invalid email or password")

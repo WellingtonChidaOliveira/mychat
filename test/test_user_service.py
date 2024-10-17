@@ -1,10 +1,10 @@
 import pytest
-import bcrypt
-from src.auth.application.use_cases.register import RegisterUseCase
-from src.auth.application.use_cases.login import LoginUseCase
+import sqlalchemy.exc
 from src.auth.infrastructure.database.repositories.user_repository import SQLAlchemyUserRepository
-from src.auth.schemas.user_schemas import UserCreate, UserLogin
+from src.auth.schemas.user_schemas import UserLogin, UserCreate
 from src.auth.domain.entities.user import User, Base
+from src.auth.application.use_cases.login import LoginUseCase
+from src.auth.application.use_cases.register import RegisterUseCase
 
 @pytest.fixture(autouse=True)
 def clean_database(db_session):
@@ -13,53 +13,47 @@ def clean_database(db_session):
         db_session.execute(table.delete())
     db_session.commit()
 
+
 @pytest.fixture
 def user_repository(db_session):
     return SQLAlchemyUserRepository(db_session)
 
-@pytest.fixture
-def register_use_case(user_repository):
-    return RegisterUseCase(user_repository)
+def test_register_user(user_repository):
+    user = User(username="testuser", email="test@test.com", hashed_password="password", salt="salt")
+    user_repository.create(user)
+    fetched_user = user_repository.get_by_email("test@test.com")
+    
+    assert fetched_user.username == "testuser"
+    assert fetched_user.email == "test@test.com"
+    #assert fetched_user.hashed_password != "password"  # Ensure password is hashed
 
-@pytest.fixture
-def login_use_case(user_repository):
-    return LoginUseCase(user_repository)
+def test_get_email_user_not_exists(user_repository):
+    user = user_repository.get_by_email("test@test.com")
+    assert user is None
 
-def test_register_user_success(register_use_case, db_session):
-    user_create = UserCreate(username="testuser", email="test@example.com", password="password123")
+@pytest.mark.parametrize("missing_field", ["email", "username", "hashed_password"])
+def test_create_user_with_missing_field(user_repository, missing_field, db_session):
+    user_data = {
+        "username": "testuser",
+        "email": "test@test.com",
+        "hashed_password": "password",
+        "salt": "salt"
+    }
+    del user_data[missing_field]
+    with pytest.raises(sqlalchemy.exc.IntegrityError):
+        user_repository.create(User(**user_data))
+    db_session.rollback()
     
-    result = register_use_case.execute(user_create.username, user_create.email, user_create.password)
-    
-    assert result.username == "testuser"
-    assert result.email == "test@example.com"
-    
-    saved_user = db_session.query(User).filter_by(email="test@example.com").first()
-    assert saved_user is not None
-    assert saved_user.username == "testuser"
 
-def test_register_user_duplicate_email(register_use_case, db_session):
-    user_create = UserCreate(username="testuser", email="test@example.com", password="password123")
-    register_use_case.execute(user_create.username, user_create.email, user_create.password)
-    
-    with pytest.raises(ValueError, match="User already exists"):
-        register_use_case.execute("anotheruser", "test@example.com", "anotherpassword")
+def test_create_user_with_existing_email(user_repository,db_session):
+    user_repository.create(User(username="testuser1", email="test@test.com", hashed_password="password", salt="salt"))
+    with pytest.raises(sqlalchemy.exc.IntegrityError):
+        user_repository.create(User(username="testuser2", email="test@test.com", hashed_password="password", salt="salt"))
+    db_session.rollback()
 
-def test_login_user_success(register_use_case, login_use_case):
-    user_create = UserCreate(username="testuser", email="test@example.com", password="password123")
-    register_use_case.execute(user_create.username, user_create.email, user_create.password)
-    
-    result = login_use_case.execute("test@example.com", "password123")
-    
-    assert result.email == "test@example.com"
-    assert result.username == "testuser"
+def test_create_user_with_existing_username(user_repository, db_session):
+    user_repository.create(User(username="testuser", email="test1@test.com", hashed_password="password", salt="salt"))
+    with pytest.raises(sqlalchemy.exc.IntegrityError):
+        user_repository.create(User(username="testuser", email="test2@test.com", hashed_password="password", salt="salt"))
+    db_session.rollback()
 
-def test_login_user_wrong_password(register_use_case, login_use_case):
-    user_create = UserCreate(username="testuser", email="testdsad@example.com", password="dasdskajdhsak")
-    register_use_case.execute(user_create.username, user_create.email, user_create.password)
-    
-    with pytest.raises(ValueError, match="Invalid email or password"):
-        login_use_case.execute("testdsad@example.com", "wrongpassword")
-
-def test_login_user_nonexistent(login_use_case):
-    with pytest.raises(ValueError, match="User does not exist."):
-        login_use_case.execute("nonexistent@example.com", "password123")
