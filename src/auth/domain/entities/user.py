@@ -1,8 +1,8 @@
+from dataclasses import dataclass
 from sqlalchemy import Column, String
-from sqlalchemy.ext.declarative import declarative_base
+from ....shared.infrastructure.database import Base
 
-Base = declarative_base()
-
+@dataclass  
 class User(Base):
     __tablename__ = "users"
     username = Column(String(255), unique=True, index=True, nullable=False)
