@@ -7,7 +7,7 @@ from ....shared.infrastructure.database import Base
 
 @dataclass
 class Embedding(Base):
-    __tablename__ = "cleaned_chats"
+    __tablename__ = "embenddings"
     id= Column(String, primary_key=True, default=lambda: str(uuid.uuid4()), index=True)
     pdf_name= Column(String, nullable=False)
     cleaned_text= Column(String, nullable=False)
