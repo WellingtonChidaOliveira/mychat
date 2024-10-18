@@ -10,8 +10,8 @@ export default function SignIn(){
     const router = useRouter();
 
     const validationSchema = Yup.object({
-        password: Yup.string().min(6, 'A senha deve ter pelo menos 6 caracteres').required('Senha é obrigatória'),
-        confirmPassword: Yup.string().min(6, 'A senha deve ter pelo menos 6 caracteres').required('Senha é obrigatória'),
+        password: Yup.string().min(6, 'A senha deve ter pelo menos 6 caracteres').required('Campo obrigatório'),
+        confirmPassword: Yup.string().min(6, 'A senha deve ter pelo menos 6 caracteres').required('Campo obrigatório'),
     });
 
     const sendForm = (values: { password: string; confirmPassword: string }) => {

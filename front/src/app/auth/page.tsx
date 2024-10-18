@@ -11,13 +11,31 @@ export default function auth() {
   const router = useRouter();
 
   const validationSchema = Yup.object({
-    email: Yup.string().email('Email inválido').required('Email é obrigatório'),
-    password: Yup.string().min(6, 'A senha deve ter pelo menos 6 caracteres').required('Senha é obrigatória'),
+    email: Yup.string().email('Email inválido').required('Campo obrigatório'),
+    password: Yup.string().min(6, 'A senha deve ter pelo menos 6 caracteres').required('Campo obrigatório'),
   });
 
-  const sendForm = (values: { email: string; password: string }) => {
-    console.log('Dados enviados:', values);
-    router.push('./'); // Redireciona após validação bem-sucedida
+  const sendForm = async (values: { email: string; password: string }) => {
+    try {
+      const response = await fetch("colocar url da api aqui", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) {
+        throw new Error("Login falhou. Verifique suas credenciais.");
+      }
+
+      const data = await response.json();
+      localStorage.setItem('token', data.access_token);
+      router.push('./');
+    } catch (error) {
+      console.error('Erro:', error);
+      alert(error.message);
+    }
   };
 
   return (
