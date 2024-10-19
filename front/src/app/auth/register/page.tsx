@@ -19,7 +19,7 @@ export default function SignIn(){
 
     const sendForm = async (values: { email: string; password: string; confirmPassword: string }) => {
         try {
-            const response = await fetch("colocar url da api aqui", {
+            const response = await fetch("http://localhost:8000/auth/register", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

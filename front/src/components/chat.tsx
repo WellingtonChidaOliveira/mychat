@@ -19,14 +19,16 @@ const Chat = ({ currentChatId }: ChatProps) => {
   const [chatId, setChatId] = useState<string | null>(currentChatId);
 
   useEffect(() => {
-    // Se não houver chatId, cria um novo chat no backend
+    // Se não houver chatId, cria um novo chat no back e recebe o chatID
     const initializeChat = async () => {
       if (!chatId) {
         try {
-          const response = await fetch('http://localhost:4000/chats', {
+          const token = localStorage.getItem('token'); // Recupera o token do localStorage
+          const response = await fetch('http://localhost:8000/chat/chats', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`, // Adiciona o token no cabeçalho
             },
           });
           const data = await response.json();
@@ -45,7 +47,12 @@ const Chat = ({ currentChatId }: ChatProps) => {
     if (!chatId) return;
 
     const fetchMessages = async () => {
-      const response = await fetch(`http://localhost:4000/chats/${chatId}/messages`);
+      const token = localStorage.getItem('token'); // Recupera o token do localStorage
+      const response = await fetch(`http://localhost:8000/chat/chat`, {
+        headers: {
+          'Authorization': `Bearer ${token}`, // Adiciona o token no cabeçalho
+        },
+      });
       const data = await response.json();
       setMessages(data);
     };
@@ -56,7 +63,7 @@ const Chat = ({ currentChatId }: ChatProps) => {
   useEffect(() => {
     if (!chatId) return;
 
-    const socket = new WebSocket(`ws://localhost:4000/chats/${chatId}/ws`);
+    const socket = new WebSocket(`ws://localhost:8000/chats/ws`);
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
