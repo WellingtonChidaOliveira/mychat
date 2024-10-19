@@ -31,7 +31,7 @@ jobs:
     - name: Test with pytest
       env:
         OPENAI_API_KEY: ${{secrets.OPENAI_API_KEY}}
-        PYTHONPATH: ${{ github.workspace }}
+        PYTHONPATH: ${{ github.workspace }}/back
       run: |
-        pytest -v -s back/
+        pytest -v -s back/test
 
