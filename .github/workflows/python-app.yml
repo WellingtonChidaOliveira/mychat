@@ -33,5 +33,5 @@ jobs:
         OPENAI_API_KEY: ${{secrets.OPENAI_API_KEY}}
         PYTHONPATH: ${{ github.workspace }}
       run: |
-        pytest -v -s back/test
+        pytest -v -s back/
 
