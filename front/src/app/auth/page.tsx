@@ -33,9 +33,14 @@ export default function auth() {
       localStorage.setItem('token', data.access_token);
       router.push('./');
     } catch (error) {
-      console.error('Erro:', error);
-      alert(error.message);
-    }
+      if (error instanceof Error) {
+          console.error('Erro:', error.message);
+          alert(error.message);
+      } else {
+          console.error('Erro desconhecido:', error);
+          alert('Ocorreu um erro desconhecido.');
+      }
+  }
   };
 
   return (
@@ -71,7 +76,7 @@ export default function auth() {
 
             <div className="w-[80%] flex flex-col  gap-[16px]">
               <Button text="Entrar" variant="primary" type="submit" />
-              <Button href="/auth/sign-in" text="Cadastre-se" variant="secundary" />
+              <Button href="/auth/register" text="Cadastre-se" variant="secundary" />
             </div>
           </Form>
         )}

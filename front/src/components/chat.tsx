@@ -12,11 +12,11 @@ type ChatProps = {
   currentChatId: string | null;
 };
 
-const Chat = ({ currentChatId: initialChatId }: ChatProps) => {
+const Chat = ({ currentChatId }: ChatProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [currentAssistantMessage, setCurrentAssistantMessage] = useState<string>('');
-  const [chatId, setChatId] = useState<string | null>(initialChatId);
+  const [chatId, setChatId] = useState<string | null>(currentChatId);
 
   useEffect(() => {
     // Se não houver chatId, cria um novo chat no backend

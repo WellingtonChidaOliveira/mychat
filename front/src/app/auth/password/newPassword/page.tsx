@@ -11,7 +11,7 @@ export default function SignIn(){
 
     const validationSchema = Yup.object({
         password: Yup.string().min(6, 'A senha deve ter pelo menos 6 caracteres').required('Campo obrigatório'),
-        confirmPassword: Yup.string().min(6, 'A senha deve ter pelo menos 6 caracteres').required('Campo obrigatório'),
+        confirmPassword: Yup.string().oneOf([Yup.ref('password'), undefined], 'As senhas precisam ser iguais').required('Campo obrigatório'),
     });
 
     const sendForm = (values: { password: string; confirmPassword: string }) => {
