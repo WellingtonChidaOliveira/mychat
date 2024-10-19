@@ -12,4 +12,4 @@ class Embedding(Base):
     pdf_name= Column(String, nullable=False)
     cleaned_text= Column(String, nullable=False)
     extra_metadata= Column(JSON, default={})
-    embeddings= Column(Vector(256), nullable=False)
+    embeddings= Column(Vector(1536), nullable=False)

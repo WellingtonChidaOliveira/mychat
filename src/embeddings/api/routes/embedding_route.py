@@ -4,6 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 import openai
 
+from ...domain.entities.embedding import Embedding
+
 from ...application.use_cases.process_pdf import ProcessPdfUseCase
 from ...infrastructure.database.repository.embedding_repository import SQLAlchemyEmbeddingRepository
 from ....shared.infrastructure.database import get_session
@@ -15,7 +17,7 @@ openai_api_key = os.getenv('OPENAI_API_KEY')
 
 router = APIRouter()
 
-@router.post("/")
+@router.get("/")
 def embedding_data(session: Session = Depends(get_session)):
     try:
         openai.api_key = openai_api_key
@@ -37,8 +39,9 @@ def embedding_data(session: Session = Depends(get_session)):
         # Process each PDF and insert into PostgreSQL
         for pdf_file in pdf_files:
             start_page = starting_pages.get(pdf_file, 1)
-            cleaned_text, embeddings, metadata = embedding_use_case.execute(pdf_file, start_page)
-            embedding_repository.create(pdf_file, cleaned_text, embeddings, metadata)
+            cleaned_text, chunk_embedding_pairs, metadata = embedding_use_case.execute(pdf_file, start_page)
+            #new_embedding = Embedding(pdf_name = pdf_file,cleaned_text= cleaned_text, embeddings =embeddings , extra_metadata= metadata)
+            embedding_repository.create(pdf_file, chunk_embedding_pairs, metadata)
     
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
