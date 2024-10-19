@@ -13,6 +13,9 @@ RUN git clone --branch v0.7.4 https://github.com/pgvector/pgvector.git \
     && make install
 # Clean up unnecessary files and packages to reduce image size
 RUN apt-get purge -y --auto-remove build-essential git postgresql-server-dev-15 libc-dev
+
+COPY init.sql /docker-entrypoint-initdb.d/
+
 # Set the default command to run when starting the container
 CMD ["postgres"]
  
