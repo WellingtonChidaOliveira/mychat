@@ -8,13 +8,55 @@ type Message = {
   content: string;
 };
 
-const Chat = () => {
+type ChatProps = {
+  currentChatId: string | null;
+};
+
+const Chat = ({ currentChatId: initialChatId }: ChatProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [currentAssistantMessage, setCurrentAssistantMessage] = useState<string>('');
+  const [chatId, setChatId] = useState<string | null>(initialChatId);
 
   useEffect(() => {
-    const socket = new WebSocket('ws://localhost:4000');
+    // Se não houver chatId, cria um novo chat no backend
+    const initializeChat = async () => {
+      if (!chatId) {
+        try {
+          const response = await fetch('http://localhost:4000/chats', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+          const data = await response.json();
+          setChatId(data.id);  // Salvar o novo chatId gerado pelo backend
+        } catch (error) {
+          console.error("Erro ao criar novo chat:", error);
+        }
+      }
+    };
+
+    initializeChat();
+  }, [chatId]);
+
+  // Fetch mensagens e conectar ao WebSocket quando houver um chatId
+  useEffect(() => {
+    if (!chatId) return;
+
+    const fetchMessages = async () => {
+      const response = await fetch(`http://localhost:4000/chats/${chatId}/messages`);
+      const data = await response.json();
+      setMessages(data);
+    };
+
+    fetchMessages();
+  }, [chatId]);
+
+  useEffect(() => {
+    if (!chatId) return;
+
+    const socket = new WebSocket(`ws://localhost:4000/chats/${chatId}/ws`);
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -31,7 +73,7 @@ const Chat = () => {
     setWs(socket);
 
     return () => socket.close();
-  }, []);
+  }, [chatId]);
 
   const handleSendMessage = (message: string) => {
     if (!ws || message.trim() === '') return;
@@ -49,8 +91,8 @@ const Chat = () => {
           ...prevMessages,
           { role: 'assistant', content: currentAssistantMessage },
         ]);
-        setCurrentAssistantMessage(''); 
-      }, 1000); 
+        setCurrentAssistantMessage('');
+      }, 1000);
 
       return () => clearTimeout(timer);
     }
