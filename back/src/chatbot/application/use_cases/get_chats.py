@@ -1,4 +1,5 @@
-from pytest import Session
+import logging
+from sqlalchemy.orm import Session 
 from ..interfaces.chat_repository import ChatRepository
 
 class GetChatsUseCase:
@@ -7,7 +8,8 @@ class GetChatsUseCase:
                 
                 
     async def execute (self, user_email: str) :
-            existing_chat_by_user = await self.chat_repository.get_chat_by_id(user_email)
+            existing_chat_by_user = self.chat_repository.get_by_user_id(user_email)
+            logging.info(f"Chat found: {existing_chat_by_user}")
             if not existing_chat_by_user:
                 raise ValueError("No chat found.")
             return existing_chat_by_user
