@@ -3,7 +3,7 @@ import os
 # from src.shared.infrastructure.redis import redis
 import uvicorn
 from fastapi import FastAPI
-from fastapi_limiter import FastAPILimiter
+from fastapi.middleware.cors import CORSMiddleware
 from src.shared.infrastructure.database import init_db
 from src.auth.api.routes.login import login_router as login_router
 from src.auth.api.routes.register import register_route as register_router
@@ -21,6 +21,14 @@ load_dotenv()  # Load environment variables from .env file
 init_db()
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # @app.on_event("startup")
 # async def startup_event():
