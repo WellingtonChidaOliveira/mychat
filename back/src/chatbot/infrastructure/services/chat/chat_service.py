@@ -18,15 +18,12 @@ if not api_key:
 
 class ChatService:
     def __init__(self):
-            openai.api_key = api_key
-            
+        openai.api_key = api_key
 
-    async def generate_response_stream(self, query):
+    async def generate_response_stream(self, conversation_history):
         try:
             response = openai.chat.completions.create(
-                messages= [
-                    {"role": "user", "content": query}
-                ],
+                messages=conversation_history,
                 model="gpt-4",
                 stream=True,
             )
@@ -37,4 +34,3 @@ class ChatService:
         except Exception as e:
             logging.error(f"Error in generate_response_stream: {e}")
             raise
-        

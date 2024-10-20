@@ -29,41 +29,48 @@ async def chat(
         token = Utils.get_header(websocket=websocket, header_name="authorization")
         chat_id = Utils.get_header(websocket=websocket, header_name="chatid")
         user_email = await get_current_user(token) if validate_token(token) else None
-        logging.info(f"Token: {user_email}")
         
         chat_repository = SQLAlchemyChatRepository(session)
-  
         rag_model = RAGModel()
         process_message_use_case = ProcessMessageUseCase(chat_repository, rag_model)
         create_chat_use_case = CreateChatUseCase(chat_repository)
         get_chat_by_id_use_case = GetChatByIdUseCase(chat_repository)
+        
         chat_context = []
 
-        if user_email and not chat_id:
-            logging.info("Creating chat")
-            chat = await create_chat_use_case.execute(user_email)
-            chat_id = chat
-        elif user_email and chat_id:
-            logging.info("Getting chat")
-            chat = await get_chat_by_id_use_case.execute(chat_id)
-            logging.info(f"Can get chat: {chat.user_id}")
-            chat_context = chat.message
-            
+        if user_email and chat_id:
+            chat = await get_chat_by_id_use_case.execute(chat_id)     
+            chat_context = [{"role": msg["role"], "content": msg["content"]} for msg in chat.message]
+        elif user_email:
+            chat_id = await create_chat_use_case.execute(user_email)
+        else:
+            # Anonymous user
+            chat_id = None
+
         while True:
             new_message = await websocket.receive_text()
             chat_context.append({"role": "user", "content": new_message})
-                
-            async for response in process_message_use_case.execute(chat_id, json.dumps(chat_context)):
-                await websocket.send_text(json.dumps({"response": response}))
-            await websocket.send_text(json.dumps({"end": True}))
+            
+            try:
+                async for response_chunk in process_message_use_case.execute(chat_id, chat_context):
+                    await websocket.send_text(json.dumps({"response": response_chunk}))
+                await websocket.send_text(json.dumps({"end": True}))
+            except ValueError as e:
+                logging.error(f"Error processing message: {str(e)}")
+                await websocket.send_text(json.dumps({"error": str(e)}))
+            except Exception as e:
+                logging.error(f"Unexpected error processing message: {str(e)}")
+                await websocket.send_text(json.dumps({"error": "An unexpected error occurred while processing your message."}))
 
     except WebSocketDisconnect:
         logging.info("WebSocket disconnected")
     except Exception as e:
-        logging.error(f"Unexpected error: {str(e)}")
-        await websocket.close(code=status.WS_1011_INTERNAL_ERROR)
+        logging.error(f"Unexpected error in WebSocket handler: {str(e)}")
+        await websocket.close(code=status.WS_1011_INTERNAL_SERVER_ERROR)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    
+    
+    
 @router.get("/health")
 async def health_check():
     return {"status": "healthy"}
