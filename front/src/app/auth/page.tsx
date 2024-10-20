@@ -68,9 +68,6 @@ export default function auth() {
                   <input type="checkbox" className="accent-[#589b97a1]" />
                   <p className="text-[#372F30]">Lembrar-me</p>
                 </div>
-                <Link href='/auth/password' passHref className='text-[#372F30] underline'>
-                    Esqueceu sua senha?
-                </Link>
               </div>
             </div>
 
