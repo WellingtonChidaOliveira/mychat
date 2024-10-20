@@ -14,7 +14,12 @@ const SideBar = ({ toggleSidebar, onSelectChat }: SidebarProps) => {
   // Fetch old chats from the backend when the sidebar is opened
   useEffect(() => {
     const fetchOldChats = async () => {
-      const response = await fetch('http://localhost:8000/chat/'); // Ajustar para a rota correta
+      const token = localStorage.getItem('token'); // Recupera o token do localStorage
+      const response = await fetch(`http://localhost:8000/chat/`, {
+        headers: {
+          'authorization': `Bearer ${token}`, // Adiciona o token no cabeçalho
+        },
+      });
       const data = await response.json();
       setOldChats(data);
     };
