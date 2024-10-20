@@ -1,6 +1,8 @@
 import json
 import logging
+from .....shared.middleware.rate_limit_middleware import RateLimiter
 from fastapi import APIRouter, Depends,HTTPException, WebSocket, WebSocketDisconnect, status
+from fastapi_limiter import FastAPILimiter
 
 from .....shared.utils.get_services import Utils
 
@@ -22,10 +24,19 @@ router = APIRouter()
 @router.websocket("/ws")
 async def chat(
     websocket: WebSocket,
-    session: Session = Depends(get_session)
+    session: Session = Depends(get_session),
 ):
     await websocket.accept()
     try:
+        rate_limite = RateLimiter(max_requests=10, time_window=60)
+        client_ip = websocket.client.host
+
+        # Rate limiting logic: Allow up to 10 messages per 60 seconds
+        if not await rate_limite.is_allowed(client_ip, 3, 60):
+            await websocket.send_text(json.dumps({"error": "Rate limit exceeded. Please wait before sending more messages."}))
+            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+            return
+        
         token = Utils.get_header(websocket=websocket, header_name="authorization")
         chat_id = Utils.get_header(websocket=websocket, header_name="chatid")
         user_email = await get_current_user(token) if validate_token(token) else None

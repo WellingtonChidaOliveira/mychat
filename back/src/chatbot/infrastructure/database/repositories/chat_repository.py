@@ -1,4 +1,5 @@
 import logging
+from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified
 from src.chatbot.application.interfaces.chat_repository import ChatRepository
@@ -13,14 +14,18 @@ class SQLAlchemyChatRepository(ChatRepository):
     
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     async def create_chat(self, chat: Chat) -> Chat:
-        #chat = Chat(user_id= user_id)
         self.session.add(chat)
         self.session.commit()
         self.session.refresh(chat)
         return chat
         
-    def get_by_user_id(self, user_id: str) -> Chat:
-        return self.session.query(Chat).filter(Chat.user_id == user_id)
+    def get_by_user_id(self, user_id: str) -> List[dict]:
+        chats = self.session.query(Chat).filter(Chat.user_id == user_id).all()
+        if not chats:
+            logging.info(f"No chats found for user_id {user_id}")
+        else:
+            logging.info(f"Chats for user_id {user_id}: {chats}")
+        return [chat.to_dict() for chat in chats]
     
     def delete_chat(self, chat_id: int, useremail: str):
         chat = self.session.query(Chat).filter(Chat.id == chat_id and Chat.user_id == useremail).first()

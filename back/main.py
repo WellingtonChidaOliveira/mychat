@@ -1,6 +1,9 @@
 import asyncio
+import os
+from src.shared.infrastructure.redis import redis
 import uvicorn
 from fastapi import FastAPI
+from fastapi_limiter import FastAPILimiter
 from src.shared.infrastructure.database import init_db
 from src.auth.api.routes.login import login_router as login_router
 from src.auth.api.routes.register import register_route as register_router
@@ -13,9 +16,14 @@ from dotenv import load_dotenv
 
 load_dotenv()  # Load environment variables from .env file
 
+
 init_db()
 
 app = FastAPI()
+
+@app.on_event("startup")
+async def startup_event():
+    await FastAPILimiter.init(redis)
 
 app.include_router(login_router.router, prefix="/auth")
 app.include_router(register_router.router, prefix="/auth")

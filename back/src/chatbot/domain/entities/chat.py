@@ -17,6 +17,13 @@ class Chat(Base):
         self.user_id = user_id
         self.message = []
         self.timestamp = datetime.now(timezone.utc)
+        
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "message": self.message
+        }
     
     
         
