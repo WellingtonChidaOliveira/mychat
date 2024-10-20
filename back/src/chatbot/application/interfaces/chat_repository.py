@@ -18,5 +18,9 @@ class ChatRepository(ABC):
         pass
     
     @abstractmethod
+    def get_by_user_id(self, user_id: str) -> list[Chat]:
+        pass
+    
+    @abstractmethod
     async def update_chat(self, chat_id: int, user_message: str, full_response: str) -> Chat:
         pass

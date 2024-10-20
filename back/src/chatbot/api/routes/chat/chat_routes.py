@@ -2,6 +2,7 @@ import json
 import logging
 from fastapi import APIRouter, Depends,HTTPException, WebSocket, WebSocketDisconnect, status
 
+
 from .....shared.utils.get_services import Utils
 
 from ....application.use_cases.get_chat_by_id import GetChatByIdUseCase
@@ -22,10 +23,11 @@ router = APIRouter()
 @router.websocket("/ws")
 async def chat(
     websocket: WebSocket,
-    session: Session = Depends(get_session)
+    session: Session = Depends(get_session),
 ):
     await websocket.accept()
     try:
+        
         token = Utils.get_header(websocket=websocket, header_name="authorization")
         chat_id = Utils.get_header(websocket=websocket, header_name="chatid")
         user_email = await get_current_user(token) if validate_token(token) else None
