@@ -25,7 +25,7 @@ class SQLAlchemyChatRepository(ChatRepository):
             logging.info(f"No chats found for user_id {user_id}")
         else:
             logging.info(f"Chats for user_id {user_id}: {chats}")
-        return [chat.to_dict() for chat in chats]
+        return [chat.to_dict_with_partial_message() for chat in chats]
     
     def delete_chat(self, chat_id: int, useremail: str):
         chat = self.session.query(Chat).filter(Chat.id == chat_id and Chat.user_id == useremail).first()

@@ -24,6 +24,13 @@ class Chat(Base):
             "user_id": self.user_id,
             "message": self.message
         }
+        
+    def to_dict_with_partial_message(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "message": self.message[-1]["content"][:15]
+        }
     
     
         
