@@ -1,6 +1,6 @@
 services:
   db:
-    build: 
+    build:
       context: ./Docker/db
       dockerfile: Dockerfile
     environment:
@@ -11,16 +11,10 @@ services:
     ports:
       - "5433:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: ["CMD-SHELL", "pg_isready -U myuser -d chatbot_db"]
       interval: 10s
       timeout: 5s
       retries: 5
-
-  redis:
-    image: redis:alpine
-    restart: always
-    ports:
-      - "6380:6379"
 
   backend:
     build: 
@@ -31,7 +25,6 @@ services:
       - "8000:8000"
     depends_on:
       - db
-      - redis
     environment:
       DATABASE_URL: postgresql://myuser:mypassword@db:5432/chatbot_db
       REDIS_URL: redis://redis:6379/0
@@ -40,7 +33,7 @@ services:
       SECRET_KEY: 
       ALGORITHM: "HS256"
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/health"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5

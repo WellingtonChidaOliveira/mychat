@@ -1,6 +1,6 @@
 import asyncio
 import os
-from src.shared.infrastructure.redis import redis
+# from src.shared.infrastructure.redis import redis
 import uvicorn
 from fastapi import FastAPI
 from fastapi_limiter import FastAPILimiter
@@ -22,9 +22,9 @@ init_db()
 
 app = FastAPI()
 
-@app.on_event("startup")
-async def startup_event():
-    await FastAPILimiter.init(redis)
+# @app.on_event("startup")
+# async def startup_event():
+#     await FastAPILimiter.init(redis)
 
 app.include_router(login_router.router, prefix="/auth")
 app.include_router(register_router.router, prefix="/auth")
