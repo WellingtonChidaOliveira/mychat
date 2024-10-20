@@ -46,7 +46,8 @@ class SQLAlchemyChatRepository(ChatRepository):
             
     async def get_chat_by_id(self, chat_id: str) -> Chat:
         try: 
-            return self.session.query(Chat).filter(Chat.id == chat_id).first()
+            chat = self.session.query(Chat).filter(Chat.id == chat_id).first()
+            return chat
         except Exception as e:
             logging.error(f"Error in get_chat_by_id: {e}")
             raise 
