@@ -13,3 +13,4 @@ class Embedding(Base):
     cleaned_text= Column(String, nullable=False)
     extra_metadata= Column(JSON, default={})
     embeddings= Column(Vector(1536), nullable=False)
+    #summary= Column(JSON, default={})

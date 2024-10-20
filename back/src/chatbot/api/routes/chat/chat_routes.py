@@ -2,8 +2,8 @@ import json
 import logging
 from fastapi import APIRouter, Depends,HTTPException, WebSocket, WebSocketDisconnect, status
 
+from .....embeddings.infrastructure.database.repository.embedding_repository import SQLAlchemyEmbeddingRepository
 
-from .....shared.utils.get_services import Utils
 
 from ....application.use_cases.get_chat_by_id import GetChatByIdUseCase
 from ....application.use_cases.create_chat import CreateChatUseCase
@@ -19,12 +19,15 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 router = APIRouter()
 
+# Carregar embeddings, cluster centers, labels, chunks e temas
+
 
 @router.websocket("/ws")
 async def chat(
     websocket: WebSocket,
     session: Session = Depends(get_session),
 ):
+
     await websocket.accept()
     try:
         
@@ -33,8 +36,8 @@ async def chat(
         user_email = await get_current_user(token) if validate_token(token) else None
         
         chat_repository = SQLAlchemyChatRepository(session)
-        rag_model = RAGModel()
-        process_message_use_case = ProcessMessageUseCase(chat_repository, rag_model)
+        embedding_repository = SQLAlchemyEmbeddingRepository(session)
+        process_message_use_case = ProcessMessageUseCase(chat_repository, embedding_repository)
         create_chat_use_case = CreateChatUseCase(chat_repository)
         get_chat_by_id_use_case = GetChatByIdUseCase(chat_repository)
         

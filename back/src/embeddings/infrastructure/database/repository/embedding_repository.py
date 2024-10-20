@@ -22,14 +22,37 @@ class SQLAlchemyEmbeddingRepository(EmbeddingRepository):
             )
             self.session.add(new_embedding)
         self.session.commit()
+  
+    def get(self, embedding_consulta: str):
+     # Converter o embedding da consulta para string adequada no formato de array do PostgreSQL
+        embedding_consulta_str = ','.join(map(str, embedding_consulta))
 
-    def get(self, embedding_id: str) -> Embedding:
-        return self.session.query(Embedding).filter(Embedding.id == embedding_id).one()
+        # Consulta SQL para calcular a similaridade e retornar os top N documentos mais similares
+        query = self.session.execute(f"""
+            SELECT text, embedding <=> ARRAY[{embedding_consulta_str}] AS similarity
+            FROM embeddings
+            ORDER BY similarity
+            """
+        ).fetchall()
+        return query
+
 
     def get_all(self) -> List[Embedding]:
-        return self.session.query(Embedding).all()
+        embeddings_data = self.session.query(Embedding).all()
+        return embeddings_data
 
     def delete(self, embedding_id: str) -> None:
         embedding = self.get(embedding_id)
         self.session.delete(embedding)
         self.session.commit()
+        
+# def buscar_similaridade(embedding_consulta, top_n=5):
+    # # Converter o embedding da consulta para string adequada no formato de array do PostgreSQL
+    # embedding_consulta_str = ','.join(map(str, embedding_consulta))
+
+    # # Consulta SQL para calcular a similaridade e retornar os top N documentos mais similares
+    # query = session.execute(f"""
+    #     SELECT text, embedding <=> ARRAY[{embedding_consulta_str}] AS similarity
+    #     FROM embeddings
+    #     ORDER BY similarity
+    #
