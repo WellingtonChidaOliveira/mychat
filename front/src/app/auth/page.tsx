@@ -17,7 +17,7 @@ export default function auth() {
 
   const sendForm = async (values: { email: string; password: string }) => {
     try {
-      const response = await fetch("colocar url da api aqui", {
+      const response = await fetch("http://localhost:8000/auth/login", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
