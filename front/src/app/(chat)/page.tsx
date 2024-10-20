@@ -7,7 +7,7 @@ interface PageProps {
 export default function Home({ currentChatId }: PageProps) {
   return (
     <div className="bg-zinc-800 rounded-[10px] flex justify-center items-center w-[70%] h-full">
-      <Chat currentChatId={currentChatId} /> {/* Passando o chatId para o Chat */}
+      <Chat currentChatId={currentChatId} />
     </div>
   );
 }

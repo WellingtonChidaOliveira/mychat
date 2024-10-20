@@ -63,12 +63,6 @@ export default function auth() {
                     <Field name="password" type="password" placeholder="Senha" component={InputField} />
                     <ErrorMessage name="password" component="div" className="text-red-500" />
                 </div>
-              <div className="flex justify-between w-full">
-                <div className="flex gap-2">
-                  <input type="checkbox" className="accent-[#589b97a1]" />
-                  <p className="text-[#372F30]">Lembrar-me</p>
-                </div>
-              </div>
             </div>
 
             <div className="w-[80%] flex flex-col  gap-[16px]">
