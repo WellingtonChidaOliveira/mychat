@@ -1,9 +1,13 @@
 import Chat from "../../components/chat";
 
-export default function Home() {
+interface PageProps {
+  currentChatId: string | null; // Recebendo o chatId
+}
+
+export default function Home({ currentChatId }: PageProps) {
   return (
     <div className="bg-zinc-800 rounded-[10px] flex justify-center items-center w-[70%] h-full">
-      <Chat></Chat>
+      <Chat currentChatId={currentChatId} /> {/* Passando o chatId para o Chat */}
     </div>
   );
 }

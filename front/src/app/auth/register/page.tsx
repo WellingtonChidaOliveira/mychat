@@ -14,12 +14,12 @@ export default function SignIn(){
     const validationSchema = Yup.object({
         email: Yup.string().email('Email inválido').required('Campo obrigatório'),
         password: Yup.string().min(6, 'A senha deve ter pelo menos 6 caracteres').required('Campo obrigatório'),
-        confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'As senhas precisam ser iguais').required('Campo obrigatório'),
+        confirmPassword: Yup.string().oneOf([Yup.ref('password'), undefined], 'As senhas precisam ser iguais').required('Campo obrigatório'),
     });
 
     const sendForm = async (values: { email: string; password: string; confirmPassword: string }) => {
         try {
-            const response = await fetch("colocar url da api aqui", {
+            const response = await fetch("http://localhost:8000/auth/register", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -35,8 +35,13 @@ export default function SignIn(){
             localStorage.setItem('token', data.access_token);
             router.push('./');
         } catch (error) {
-            console.error('Erro:', error);
-            alert(error.message);
+            if (error instanceof Error) {
+                console.error('Erro:', error.message);
+                alert(error.message);
+            } else {
+                console.error('Erro desconhecido:', error);
+                alert('Ocorreu um erro desconhecido.');
+            }
         }
     };
     
