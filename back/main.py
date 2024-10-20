@@ -11,7 +11,7 @@ from src.chatbot.api.routes.chat import chat_routes as websocket_chat_router
 from src.chatbot.api.routes.delete_chat import delete_chat_route as delete_chat_router
 from src.chatbot.api.routes.get_chats import get_chats_route as get_chats_router
 from src.chatbot.api.routes.get_chat_by_id import get_chat_by_id_route as get_chatby_id_router
-from src.embeddings.api.routes import embedding_route as embedding_router
+# from back.src.embeddings.api.routes import embedding_populate as embedding_router
 from dotenv import load_dotenv
 
 
@@ -30,10 +30,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# @app.on_event("startup")
-# async def startup_event():
-#     await FastAPILimiter.init(redis)
-
 app.include_router(login_router.router, prefix="/auth")
 app.include_router(register_router.router, prefix="/auth")
 app.include_router(websocket_chat_router.router, prefix="/chat")
@@ -41,7 +37,6 @@ app.include_router(delete_chat_router.router, prefix="/chat")
 app.include_router(get_chats_router.router, prefix="/chat")
 app.include_router(get_chatby_id_router.router, prefix="/chat")
 
-app.include_router(embedding_router.router, prefix="/embeddings")
 
 async def main():
     config = uvicorn.Config(app, host="localhost", port=8000, log_level="info")
