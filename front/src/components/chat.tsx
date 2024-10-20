@@ -33,7 +33,18 @@ const Chat = ({ currentChatId }: ChatProps) => {
       };
       fetchMessages();
     }
-    const socket = new WebSocket(`ws://localhost:8000/chat/ws`); //realiza a conexão ws
+
+    const token = localStorage.getItem('token'); // Recupera o token do localStorage
+    if (chatId && token){
+      var socket = new WebSocket( //faz a conexão ws
+        `ws://localhost:8000/chat/ws?token=${encodeURIComponent(token)}&chatId=${encodeURIComponent(chatId)}`
+      );
+    }
+    
+    else{
+      var socket = new WebSocket( //faz a conexão ws
+      `ws://localhost:8000/chat/ws?token=${encodeURIComponent(token)}`
+    );}
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);

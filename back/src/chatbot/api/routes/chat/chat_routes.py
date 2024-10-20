@@ -28,8 +28,8 @@ async def chat(
     await websocket.accept()
     try:
         
-        token = Utils.get_header(websocket=websocket, header_name="authorization")
-        chat_id = Utils.get_header(websocket=websocket, header_name="chatid")
+        token = websocket.query_params.get("token")
+        chat_id = websocket.query_params.get("chat_id")
         user_email = await get_current_user(token) if validate_token(token) else None
         
         chat_repository = SQLAlchemyChatRepository(session)
