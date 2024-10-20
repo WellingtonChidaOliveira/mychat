@@ -8,13 +8,62 @@ type Message = {
   content: string;
 };
 
-const Chat = () => {
+type ChatProps = {
+  currentChatId: string | null;
+};
+
+const Chat = ({ currentChatId }: ChatProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [currentAssistantMessage, setCurrentAssistantMessage] = useState<string>('');
+  const [chatId, setChatId] = useState<string | null>(currentChatId);
 
   useEffect(() => {
-    const socket = new WebSocket('ws://localhost:4000');
+    // Cria um chat caso não tenha chatID
+    const initializeChat = async () => {
+      if (!chatId) {
+        try {
+          const token = localStorage.getItem('token'); // Recupera o token do localStorage
+          const response = await fetch('http://localhost:8000/chat/ws', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`, // Adiciona o token no cabeçalho
+            },
+          });
+          const data = await response.json();
+          setChatId(data.id);  // Salvar o novo chatId gerado pelo backend
+        } catch (error) {
+          console.error("Erro ao criar novo chat:", error);
+        }
+      }
+    };
+
+    initializeChat();
+  }, [chatId]);
+
+  // Recebe as mensagens de um chatID
+  useEffect(() => {
+    if (!chatId) return;
+
+    const fetchMessages = async () => {
+      const token = localStorage.getItem('token'); // Recupera o token do localStorage
+      const response = await fetch(`http://localhost:8000/chat/${chatId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`, // Adiciona o token no cabeçalho
+        },
+      });
+      const data = await response.json();
+      setMessages(data);
+    };
+
+    fetchMessages();
+  }, [chatId]);
+
+  useEffect(() => {
+    if (!chatId) return;
+
+    const socket = new WebSocket(`ws://localhost:8000/chats/ws`);
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -31,7 +80,7 @@ const Chat = () => {
     setWs(socket);
 
     return () => socket.close();
-  }, []);
+  }, [chatId]);
 
   const handleSendMessage = (message: string) => {
     if (!ws || message.trim() === '') return;
@@ -49,8 +98,8 @@ const Chat = () => {
           ...prevMessages,
           { role: 'assistant', content: currentAssistantMessage },
         ]);
-        setCurrentAssistantMessage(''); 
-      }, 1000); 
+        setCurrentAssistantMessage('');
+      }, 1000);
 
       return () => clearTimeout(timer);
     }
