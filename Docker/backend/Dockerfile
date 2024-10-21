@@ -19,5 +19,5 @@ ENV PYTHONPATH=/app
 # Expose the port the app runs on
 EXPOSE 8000
 
-# Command to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Command to run the embedding populate script and then start the application
+CMD ["sh", "-c", "PYTHONPATH=/app python3 -m src.embeddings.api.routes.embedding_populate && uvicorn main:app --host 0.0.0.0 --port 8000"]

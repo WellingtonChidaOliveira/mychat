@@ -28,7 +28,7 @@ try:
     embedding_repository = SQLAlchemyEmbeddingRepository(session)
 
     # Definir o diretório onde os PDFs estão localizados
-    pdf_directory = os.path.join(os.getcwd(), 'back','data', 'files', 'sustainability')
+    pdf_directory = os.path.join(os.getcwd(), 'data', 'files', 'sustainability')
     pdf_files = [f for f in os.listdir(pdf_directory) if f.endswith('.pdf')]
 
     embedding_use_case = ProcessPdfUseCase(pdf_directory=pdf_directory)
