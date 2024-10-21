@@ -3,6 +3,8 @@ import openai
 import logging
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
+
+from data.testes.embedding_chunk import cluster_embeddings
 from ...application.use_cases.process_pdf import ProcessPdfUseCase
 from ...infrastructure.database.repository.embedding_repository import SQLAlchemyEmbeddingRepository
 from ....shared.infrastructure.database import get_session, init_db
@@ -42,6 +44,7 @@ try:
         logging.info(f"Processando PDF {index}/{total_files} ({(index/total_files)*100:.2f}%)")
         start_page = starting_pages.get(pdf_file, 1)
         cleaned_text, chunk_embedding_pairs, metadata = embedding_use_case.execute(pdf_file, start_page)
+        #summary = cluster_embeddings(chunk_embedding_pairs)
         embedding_repository.create(pdf_file, chunk_embedding_pairs, metadata)
 
     print("PDFs processados com sucesso")

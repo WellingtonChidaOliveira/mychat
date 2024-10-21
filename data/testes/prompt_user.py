@@ -13,7 +13,7 @@ embeddings = data['embeddings']
 cluster_centers = data['cluster_centers']
 labels = data['labels']
 chunks = data['chunks']
-themes = data['themes'].item()  # O item() é necessário porque temas é um dicionário
+# themes = data['themes'].item()  # O item() é necessário porque temas é um dicionário
 
 # Função para gerar o embedding da pergunta
 def generate_question_embedding(question: str, model="text-embedding-ada-002") -> List[float]:
@@ -88,8 +88,7 @@ def generate_response(question: str, top_k_chunks: List[str]) -> str:
         return None
 
 # Função para processar a pergunta do usuário e retornar os documentos mais relevantes
-def process_user_question(question: str, cluster_centers: np.ndarray, chunks: List[str], 
-                          embeddings: List[List[float]], kmeans_labels: List[int], top_k: int = 5):
+def process_user_question(question: str, embeddings: List[List[float]], kmeans_labels: List[int], top_k: int = 5):
     # Gera o embedding da pergunta
     question_embedding = generate_question_embedding(question)
     
@@ -113,7 +112,7 @@ def process_user_question(question: str, cluster_centers: np.ndarray, chunks: Li
             result = {
                 "Pergunta_usuário": question,
                 "Resposta": response,  # Usa a resposta gerada
-                "Tema_cluster": themes[relevant_cluster]
+                # "Tema_cluster": themes[relevant_cluster]
             }
 
             # Converte o dicionário em JSON
@@ -126,4 +125,4 @@ def process_user_question(question: str, cluster_centers: np.ndarray, chunks: Li
         print("Erro ao gerar o embedding da pergunta.")
 
 # Chamada da função para processar a pergunta do usuário
-process_user_question(user_question, cluster_centers, chunks, embeddings, labels, top_k=5)
+process_user_question(user_question, embeddings, labels, top_k=5)
