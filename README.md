@@ -87,13 +87,30 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 Install the dependencies:
 
 ```bash
-pip install -r requirements.txt
+pip install -r back/requirements.txt
 ```
 
-Configure the environment variables: Create a `.env` file in the root directory and add the following:
+Configure the environment variables: Create a `.env` file in the back directory and add the following:
 
 ```
 OPENAI_API_KEY=your_openai_api_key
+```
+
+To start the database, use: 
+```
+make api-up
+```
+
+To stop the database, use:
+```
+make api-down
+```
+
+Open a new terminal and run the commands below to start the front-end:
+```
+cd .\front\
+npm install
+npm run dev
 ```
 
 ### Option 2: Docker Setup
