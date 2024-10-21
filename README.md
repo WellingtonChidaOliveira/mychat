@@ -1,49 +1,91 @@
-## Chat Application
-Este repositório contém um aplicativo de chat desenvolvido com Next.js, React e TypeScript. O objetivo do projeto é fornecer uma interface de chat onde os usuários podem interagir com um assistente virtual, realizar login e gerenciar suas contas.
+# Climate Action Plan Assistant
 
-## Estrutura do Projeto
-O projeto é organizado nas seguintes pastas e arquivos principais:
+This project processes user questions related to climate action plans by embedding the question, comparing it with pre-generated document embeddings, and generating a response using OpenAI's API. It uses PostgreSQL with the `pgvector` extension for vector search capabilities and is containerized with Docker for easy deployment.
 
-src/app/(chat)/layout.tsx: Componente de layout que envolve a estrutura do chat, incluindo o cabeçalho e a área principal do chat.
+## Table of Contents
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Docker Setup](#docker-setup)
+- [Running the Application with Docker](#running-the-application-with-docker)
+- [PostgreSQL with pgvector Setup](#postgresql-with-pgvector-setup)
+- [Chat Application](#chat-application)
+- [Usage](#usage)
+- [Environment Variables](#environment-variables)
+- [Contributing](#contributing)
+- [License](#license)
 
-src/app/(chat)/page.tsx: Página principal do chat que verifica a autenticação do usuário e renderiza o componente de chat.
+## Requirements
 
-src/app/auth/layout.tsx: Componente de layout para as páginas de autenticação.
+- Python 3.x
+- PostgreSQL with `pgvector`
+- Required Python libraries:
+  - `numpy`
+  - `openai`
+  - `dotenv`
+  - `psycopg2`
+  - `scikit-learn`
+  - `Next.js`, `React`, and `TypeScript` for the chat application
 
-src/app/auth/page.tsx: Página de login, onde os usuários podem inserir suas credenciais. A validação é feita utilizando Formik e Yup.
+## Installation
 
-src/app/layout.tsx: Layout raiz do aplicativo, onde são definidas as fontes e metadados.
+### Option 1: Manual Setup
 
-src/components/button.tsx: Componente de botão reutilizável.
+1. **Clone the repository**:
+    ```bash
+    git clone https://github.com/yourusername/climate-action-assistant.git
+    cd climate-action-assistant
+    ```
 
-src/components/chat.tsx: Componente do chat que gerencia as mensagens enviadas e recebidas.
+2. **Create a virtual environment**:
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows: venv\Scripts\activate
+    ```
 
-src/components/header.tsx: Cabeçalho do aplicativo que inclui um botão de logout.
+3. **Install dependencies**:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-src/components/inputField.tsx: Componente de campo de entrada reutilizável para formulários.
+4. **Configure environment variables**:
+    Create a `.env` file in the root directory and add the following:
+    ```bash
+    OPENAI_API_KEY=your_openai_api_key
+    ```
 
-src/components/modalAuth.tsx: Modal de autenticação que contém os formulários de login e registro.
+### Option 2: Docker Setup
 
-src/components/textBar.tsx: Componente da barra de texto para enviar mensagens.
+The project also provides a Docker setup for the FastAPI-based application and PostgreSQL with `pgvector`.
 
-## Instruções de Uso
-### Clone o repositório:
-git clone <URL do repositório>
-cd <nome do repositório>
+### Running the Application with Docker
 
+To make it easier to deploy and manage the environment, we provide a `Dockerfile` to run the application inside a container.
 
-### Instale as dependências:
-npm install
+#### Dockerfile Overview
 
-### Inicie o servidor de desenvolvimento:
-npm run dev
-Acesse a aplicação: Abra o navegador e vá para http://localhost:3000.
+The Dockerfile is used to create a containerized Python application running FastAPI with the required dependencies installed. Below is the Dockerfile content:
 
-## Funcionalidades
-Autenticação: Os usuários podem realizar login e logout, utilizando um token armazenado no localStorage.
-Chat em tempo real: Mensagens enviadas pelos usuários são processadas e respondidas pelo assistente virtual.
-Validação de formulário: Utiliza Formik e Yup para validação de entradas de email e senha.
+```dockerfile
+# Use the official Python image from Docker Hub
+FROM python:3.10-slim
 
-## Requisitos
-Node.js
-Um backend em execução em http://localhost:8000 para autenticação e envio de mensagens.
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the requirements file into the container
+COPY ./back/requirements.txt /app/requirements.txt
+
+# Install the dependencies
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+# Copy the rest of the application code into the container
+COPY ./back /app
+
+# Set environment variables (if any)
+ENV PYTHONPATH=/app
+
+# Expose the port the app runs on
+EXPOSE 8000
+
+# Command to run the application
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
