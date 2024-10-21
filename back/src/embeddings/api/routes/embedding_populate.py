@@ -4,7 +4,7 @@ import logging
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 
-from data.testes.embedding_chunk import cluster_embeddings
+# from data.testes.embedding_chunk import cluster_embeddings
 from ...application.use_cases.process_pdf import ProcessPdfUseCase
 from ...infrastructure.database.repository.embedding_repository import SQLAlchemyEmbeddingRepository
 from ....shared.infrastructure.database import get_session, init_db

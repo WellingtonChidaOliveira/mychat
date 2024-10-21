@@ -36,7 +36,6 @@ class SQLAlchemyEmbeddingRepository(EmbeddingRepository):
         ).fetchall()
         return query
 
-
     def get_all(self) -> List[Embedding]:
         embeddings_data = self.session.query(Embedding).all()
         return embeddings_data
