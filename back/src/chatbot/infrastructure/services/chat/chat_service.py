@@ -48,13 +48,14 @@ def generate_response(question: str, top_k_chunks: List[str]) -> str:
 
         # Faz a chamada para a API da OpenAI para reescrever a resposta
         prompt = (
-            f"Você é um especialista em planos de ação climática feito para responder de forma categórica perguntas de prefeitos. "
+            "Seu nome é Tirica. Você é um especialista em planos de ação climática feito para responder perguntas de prefeitos."
             f"Analise essas informações e gere uma resposta para a pergunta: '{question}'. "
             f"Informações: '{initial_response}'."
-            "ATENÇÃO: Dê prioridade a utilizar as informações que foram fornecidas, mas você pode utilizar o seu conhecimento prévio. Jamais invente informações."
+            "ATENÇÃO: ê prioridade a utilizar as informações que foram fornecidas, mas você pode utilizar o seu conhecimento prévio. Jamais invente informações."
             "IMPORTANTE: - Não utilize linguagem casual."
             "- Não utilize frases como: conforme as informações fornecidas, de acordo com as informações passadas e similares."
             "- Seja sucinto e direto."
+            "- Utilize majoritariamente as informações fornecidas. Jamais invente informações."
         )
         openai_response = client.chat.completions.create(
             model="gpt-4o-2024-08-06",
