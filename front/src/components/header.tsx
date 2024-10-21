@@ -2,15 +2,9 @@
 
 import Image from "next/image";
 import ToggleButton from "./toggleButton";
-import DownloadButton from "./downloadButton";
 import { useRouter } from 'next/navigation'; // Corrigido para usar o hook useRouter corretamente
 
-type HeaderProps = {
-  isSidebarOpen: boolean;
-  toggleSidebar: () => void;
-}
-
-export default function Header({ isSidebarOpen, toggleSidebar }: HeaderProps) {
+export default function Header() {
   const router = useRouter(); // Usar o hook useRouter no client-side
 
   const handleLogout = () => {
@@ -20,13 +14,6 @@ export default function Header({ isSidebarOpen, toggleSidebar }: HeaderProps) {
 
   return (
     <div className="flex items-center justify-between px-4">
-      {!isSidebarOpen ? (
-        <div className="flex items-center gap-2">
-          <ToggleButton toggleSidebar={toggleSidebar} className="hover:bg-zinc-800 rounded-md p-2" />
-          <DownloadButton className="hover:bg-zinc-800 rounded-md p-2" />
-        </div>
-      ) : null}
-
       <div className="flex gap-2">
         <Image src="/logo.png" alt="logo" height={32} width={32} />
         <h1 className="text-2xl"><b>LOGO</b></h1>
