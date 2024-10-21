@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import ToggleButton from "./toggleButton";
 import { useRouter } from 'next/navigation'; // Corrigido para usar o hook useRouter corretamente
 
 export default function Header() {
