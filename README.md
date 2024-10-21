@@ -73,8 +73,8 @@ For the chat application:
 Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/climate-action-assistant.git
-cd climate-action-assistant
+git clone https://github.com/WellingtonChidaOliveira/mychat.git
+cd mychat
 ```
 
 Create a virtual environment:
