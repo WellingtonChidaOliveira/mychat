@@ -51,7 +51,7 @@ def generate_response(question: str, top_k_chunks: List[str]) -> str:
             f"Você é um especialista em planos de ação climática feito para responder de forma categórica perguntas de prefeitos. "
             f"Analise essas informações e gere uma resposta para a pergunta: '{question}'. "
             f"Informações: '{initial_response}'."
-            "ATENÇÃO: Utilize somente as informações fornecidas. Jamais invente informações."
+            "ATENÇÃO: Dê prioridade a utilizar as informações que foram fornecidas, mas você pode utilizar o seu conhecimento prévio. Jamais invente informações."
             "IMPORTANTE: - Não utilize linguagem casual."
             "- Não utilize frases como: conforme as informações fornecidas, de acordo com as informações passadas e similares."
             "- Seja sucinto e direto."
