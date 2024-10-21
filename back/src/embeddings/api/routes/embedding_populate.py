@@ -1,7 +1,5 @@
 import os
-import openai
 import logging
-from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 
 # from data.testes.embedding_chunk import cluster_embeddings
@@ -12,10 +10,6 @@ from ....shared.infrastructure.database import get_session, init_db
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
 
-# Carregar variáveis de ambiente do arquivo .env
-load_dotenv()
-openai_api_key = os.getenv('OPENAI_API_KEY')
-
 # Inicializar o banco de dados
 init_db()
 
@@ -24,7 +18,6 @@ session: Session = next(get_session())
 
 try:
     # Configurar a chave da API OpenAI
-    openai.api_key = openai_api_key
     embedding_repository = SQLAlchemyEmbeddingRepository(session)
 
     # Definir o diretório onde os PDFs estão localizados

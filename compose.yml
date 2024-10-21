@@ -9,31 +9,31 @@ services:
       POSTGRES_PASSWORD: mypassword
     restart: always
     ports:
-      - "5433:5432"
+      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U myuser -d chatbot_db"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # backend:
-  #   build: 
-  #     context: .
-  #     dockerfile: Docker/backend/Dockerfile
-  #   restart: always
-  #   ports:
-  #     - "8000:8000"
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #   environment:
-  #     DATABASE_URL: postgresql://myuser:mypassword@db:5432/chatbot_db
-  #     OPENAI_API_KEY: ${OPENAI_API_KEY}
-  #     ACCESS_TOKEN_EXPIRE_HOURS: "24"
-  #     SECRET_KEY: ${SECRET_KEY}
-  #     ALGORITHM: ${ALGORITHM}
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
+  backend:
+    build: 
+      context: .
+      dockerfile: Docker/backend/Dockerfile
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://myuser:mypassword@db:5432/chatbot_db
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ACCESS_TOKEN_EXPIRE_HOURS: "24"
+      SECRET_KEY: ${SECRET_KEY}
+      ALGORITHM: ${ALGORITHM}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
