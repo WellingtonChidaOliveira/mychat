@@ -9,8 +9,16 @@ export default function TextBar({ onSendMessage }: TextBarProps) {
   const [input, setInput] = useState('');
 
   const handleSendClick = () => {
-    onSendMessage(input);
-    setInput('');
+    if (input.trim() !== '') {  // Verifica se o input não está vazio
+      onSendMessage(input);
+      setInput('');
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSendClick(); // Chama a função de envio ao pressionar "Enter"
+    }
   };
 
   return (
@@ -19,6 +27,7 @@ export default function TextBar({ onSendMessage }: TextBarProps) {
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        onKeyDown={handleKeyDown} // Adiciona o manipulador de eventos para a tecla "Enter"
         placeholder="Escreva a sua mensagem aqui"
         className="w-full rounded-[10px] px-4 py-3 bg-zinc-600 hover:bg-zinc-500 placeholder-gray-100"
       />

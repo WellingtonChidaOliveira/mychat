@@ -4,11 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation"; // ou 'next/router' dependendo da versão
 import Chat from "../../components/chat";
 
-interface PageProps {
-  currentChatId: string | null; // Recebendo o chatId
-}
-
-export default function Home({ currentChatId }: PageProps) {
+export default function Home() {
   const router = useRouter();
   const [loading, setLoading] = useState(true); // Estado de carregamento
 
@@ -28,7 +24,7 @@ export default function Home({ currentChatId }: PageProps) {
 
   return (
     <div className="bg-zinc-800 rounded-[10px] flex justify-center items-center w-[70%] h-full">
-      <Chat currentChatId={currentChatId} />
+      <Chat/>
     </div>
   );
 }

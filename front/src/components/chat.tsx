@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import TextBar from './textBar';
 
 type Message = {
@@ -8,83 +8,40 @@ type Message = {
   content: string;
 };
 
-type ChatProps = {
-  currentChatId: string | null;
-};
-
-const Chat = ({ currentChatId }: ChatProps) => {
+const Chat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [ws, setWs] = useState<WebSocket | null>(null);
-  const [currentAssistantMessage, setCurrentAssistantMessage] = useState<string>('');
-  const [chatId, setChatId] = useState<string | null>(currentChatId);
 
-  useEffect(() => {
-    if (chatId) { //se um chatID estiver sendo utilizado, busca o historico de mensagens desse chat
-      const fetchMessages = async () => {
-        const token = localStorage.getItem('token'); // Recupera o token do localStorage
-        const response = await fetch(`http://localhost:8000/chat/${chatId}`, {
-          headers: {
-            'authorization': `Bearer ${token}`, // Adiciona o token no cabeçalho
-            'chat_id': chatId
-          },
-        });
-        const data = await response.json();
-        setMessages(data);
-      };
-      fetchMessages();
-    }
-
-    const token = localStorage.getItem('token'); // Recupera o token do localStorage
-    if (chatId && token){
-      var socket = new WebSocket( //faz a conexão ws
-        `ws://localhost:8000/chat/ws?token=${encodeURIComponent(token)}&chatId=${encodeURIComponent(chatId)}`
-      );
-    }
-    
-    else{
-      var socket = new WebSocket( //faz a conexão ws
-      `ws://localhost:8000/chat/ws?token=${encodeURIComponent(token)}`
-    );}
-
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-
-      if (data.role === 'assistant') {
-        setCurrentAssistantMessage((prev) => prev + data.content);
-      }
-    };
-
-    socket.onclose = () => {
-      console.log("WebSocket closed");
-    };
-
-    setWs(socket);
-
-    return () => socket.close();
-  }, [chatId]);
-
-  const handleSendMessage = (message: string) => {
-    if (!ws || message.trim() === '') return;
+  const handleSendMessage = async (message: string) => {
+    if (message.trim() === '') return;
 
     const newMessage: Message = { role: 'user', content: message };
     setMessages((prevMessages) => [...prevMessages, newMessage]);
 
-    ws.send(JSON.stringify({ message }));
-  };
+    const token = localStorage.getItem('token'); // Recupera o token do localStorage
 
-  useEffect(() => {
-    if (currentAssistantMessage) {
-      const timer = setTimeout(() => {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { role: 'assistant', content: currentAssistantMessage },
-        ]);
-        setCurrentAssistantMessage('');
-      }, 1000);
+    // Envia a mensagem para o backend
+    try {
+      const response = await fetch(`http://localhost:8000/chat/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'authorization': `Bearer ${token}`, // Adiciona o token no cabeçalho
+        },
+        body: JSON.stringify({ message }),
+      });
 
-      return () => clearTimeout(timer);
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      const data = await response.json();
+      // Assume que a resposta do servidor é a mensagem do assistente
+      const assistantMessage: Message = { role: 'assistant', content: data.response };
+      setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+    } catch (error) {
+      console.error('Error sending message:', error);
     }
-  }, [currentAssistantMessage]);
+  };
 
   return (
     <div className="flex flex-col h-full w-full p-4">
@@ -100,12 +57,6 @@ const Chat = ({ currentChatId }: ChatProps) => {
             {message.content}
           </div>
         ))}
-
-        {currentAssistantMessage && (
-          <div className="p-2 my-2 w-fit max-w-prose break-words whitespace-pre-wrap bg-gray-300 text-black self-start mr-auto rounded-lg">
-            {currentAssistantMessage}
-          </div>
-        )}
       </div>
       <TextBar onSendMessage={handleSendMessage} />
     </div>
