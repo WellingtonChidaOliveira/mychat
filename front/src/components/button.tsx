@@ -4,7 +4,7 @@ type ButtonProps = {
     href?: string;
     text: string;
     variant: 'primary' | 'secundary';
-    type?: 'button' | 'submit'; // Adiciona o tipo 'submit' aqui
+    type?: 'button' | 'submit'; 
     onClick?: () => void;
   };
   
