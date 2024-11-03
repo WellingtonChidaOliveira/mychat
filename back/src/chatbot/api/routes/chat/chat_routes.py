@@ -9,7 +9,7 @@ from ....application.use_cases.get_chat_by_id import GetChatByIdUseCase
 from ....application.use_cases.create_chat import CreateChatUseCase
 from ....application.use_cases.process_message import ProcessMessageUseCase
 from ....infrastructure.database.repositories.chat_repository import SQLAlchemyChatRepository
-from .....shared.middleware.token_middleware import get_current_user, validate_token
+from .....shared.middleware.token_middleware import get_current_user, require_roles, validate_token
 from .....shared.infrastructure.database import get_session
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -24,6 +24,7 @@ async def chat(
     request: Request,
     user_interaction: UserInteraction,
     session: Session = Depends(get_session),
+    dependencies=[Depends(require_roles(["user"]))]
 ):
     try:
         token = request.headers.get("authorization")

@@ -1,6 +1,9 @@
 from datetime import datetime, timedelta, timezone
 import os
+from typing import List
 from dotenv import load_dotenv
+from fastapi import HTTPException, Security
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt 
 
 
@@ -10,6 +13,8 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_HOURS = os.getenv("ACCESS_TOKEN_EXPIRE_HOURS", "1")
 
+
+security = HTTPBearer()
 
 def create_token(data: dict):
         to_encode = data.copy()
@@ -45,3 +50,12 @@ async def get_current_user(token: str):
     except:
         return None
     
+def require_roles(roles: List[str]):
+    def role_checker(credentials: HTTPAuthorizationCredentials = Security(security)):
+        token = credentials.credentials
+        decoded_token = decode_token(token)
+        user_roles = decoded_token.get("roles", [])
+        if not any(role in user_roles for role in roles):
+            raise HTTPException(status_code=403, detail="Insufficient permissions")
+        return decoded_token
+    return role_checker

@@ -1,6 +1,4 @@
 import asyncio
-import os
-# from src.shared.infrastructure.redis import redis
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,7 +9,6 @@ from src.chatbot.api.routes.chat import chat_routes as websocket_chat_router
 from src.chatbot.api.routes.delete_chat import delete_chat_route as delete_chat_router
 from src.chatbot.api.routes.get_chats import get_chats_route as get_chats_router
 from src.chatbot.api.routes.get_chat_by_id import get_chat_by_id_route as get_chatby_id_router
-# from back.src.embeddings.api.routes import embedding_populate as embedding_router
 from dotenv import load_dotenv
 
 
@@ -29,6 +26,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 app.include_router(login_router.router, prefix="/auth")
 app.include_router(register_router.router, prefix="/auth")
