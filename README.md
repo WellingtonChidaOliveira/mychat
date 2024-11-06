@@ -1,5 +1,7 @@
 # Climate Action Plan Assistant
 
+Link to Presentation: https://www.canva.com/design/DAGU5BXI6Vo/sIUx51njEXVux6uapMifiw/edit?utm_content=DAGU5BXI6Vo&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+
 This project processes user questions related to climate action plans by embedding the question, comparing it with pre-generated document embeddings, and generating a response using OpenAI's API. It uses PostgreSQL with the pgvector extension for vector search capabilities and is containerized with Docker for easy deployment.
 
 ## Table of Contents
