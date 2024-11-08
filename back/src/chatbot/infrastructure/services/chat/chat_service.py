@@ -3,7 +3,6 @@ import os
 import numpy as np
 import json  # Importa o módulo JSON
 from typing import List
-
 from openai import OpenAI
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
@@ -48,7 +47,7 @@ def generate_response(question: str, top_k_chunks: List[str]) -> str:
 
         # Faz a chamada para a API da OpenAI para reescrever a resposta
         prompt = (
-            '''Seu nome é Tirica. Você é um especialista em planos de ação climática municipais e responde diretamente a perguntas de prefeitos com clareza, precisão e foco em soluções pragmáticas e implementáveis. Ao responder a '{question}' com as informações fornecidas ('{initial_response}'), siga as instruções abaixo.
+            f'''Seu nome é Tirica. Você é um especialista em planos de ação climática municipais e responde diretamente a perguntas de prefeitos com clareza, precisão e foco em soluções pragmáticas e implementáveis. Ao responder a '{question}' com as informações fornecidas ('{initial_response}'), siga as instruções abaixo.
             INSTRUÇÕES:
             - Estruture a resposta em três seções:
             1. **Resumo Executivo**: Forneça um resumo direto das recomendações principais, considerando o contexto municipal, incluindo o tamanho e a densidade populacional.
