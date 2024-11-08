@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import TextBar from './textBar';
+import ReactMarkdown from 'react-markdown';
 
 // Define the type Message with two properties: role and content.
 type Message = {
@@ -44,10 +45,11 @@ const Chat = () => {
 
       // Parse the JSON response from the backend.
       const data = await response.json();
+      const resposta = JSON.parse(data.assistant);
       // Logs the response data (for debugging purposes)
       console.log(data)
       // Create a new assistant message using the content from the server response.
-      const assistantMessage: Message = { role: 'assistant', content: data.assistant };
+      const assistantMessage: Message = { role: 'assistant', content: resposta.Resposta};
       // Update the message state to include the assistant's response.
       setMessages((prevMessages) => [...prevMessages, assistantMessage]);
     } catch (error) {
@@ -55,7 +57,6 @@ const Chat = () => {
       console.error('Error sending message:', error);
     }
   };
-
   return (
     <div className="flex flex-col h-full w-full p-4">
       {/* This div contains all the messages and scrolls automatically when there are too many */}
@@ -69,7 +70,11 @@ const Chat = () => {
                 ? 'bg-[#3ea59f] text-white self-end ml-auto' // User messages: right-aligned with specific colors
                 : 'bg-gray-300 text-black self-start mr-auto' // Assistant messages: left-aligned with specific colors
             } rounded-lg`}>
-            {message.content} {/* Displays the content of the message */}
+            {message.role === 'assistant' ? (
+              <ReactMarkdown>{message.content}</ReactMarkdown> // Render assistant's messages as Markdown
+            ) : (
+              message.content // Render user's messages as plain text
+            )}
           </div>
         ))}
       </div>
